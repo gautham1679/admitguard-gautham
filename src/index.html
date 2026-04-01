@@ -233,6 +233,137 @@
             opacity: 0.6;
         }
 
+        /* Audit Log Styles */
+        .audit-log-container {
+            padding: 16px;
+            display: none;
+        }
+
+        .audit-table-wrapper {
+            overflow-x: auto;
+            margin-top: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .audit-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        .audit-table th {
+            background-color: #f8f9fa;
+            padding: 12px;
+            font-weight: 600;
+            color: #1a1a2e;
+            border-bottom: 2px solid #ddd;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .audit-table th:hover {
+            background-color: #eef1f4;
+        }
+
+        .audit-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+
+        .audit-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .flagged-row {
+            background-color: #fff5f5;
+        }
+
+        .flagged-row td {
+            border-left: 4px solid #e74c3c;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-cleared { background-color: #d4edda; color: #155724; }
+        .status-pending { background-color: #fff3cd; color: #856404; }
+        .status-flagged { background-color: #f8d7da; color: #721c24; }
+
+        .view-toggle-container {
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px 16px 0;
+        }
+
+        .nav-link {
+            color: #e67e22;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+
+        .log-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            background-color: white;
+            transition: all 0.2s;
+        }
+
+        .btn-export {
+            color: #27ae60;
+            border-color: #27ae60;
+        }
+
+        .btn-export:hover {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .btn-clear {
+            color: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+        .btn-clear:hover {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .no-logs {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
         /* Mobile responsiveness */
         @media (max-width: 480px) {
             .card {
@@ -266,9 +397,15 @@
                 ⚠️ FLAGGED FOR MANAGER REVIEW: This submission has 3+ exceptions and requires manager approval before processing.
             </div>
             <div class="header">
-                <h1>AdmitGuard</h1>
+                <h1 id="headerTitle">AdmitGuard</h1>
             </div>
-            <div class="form-container">
+            
+            <div class="view-toggle-container">
+                <a id="toggleViewBtn" class="nav-link">View Audit Log →</a>
+            </div>
+
+            <!-- Form View -->
+            <div id="formView" class="form-container">
                 <div id="rejectionBanner" class="rejection-banner">
                     This candidate has been rejected in the interview. Submission is blocked.
                 </div>
@@ -416,11 +553,39 @@
                     <button type="submit" id="submitBtn" class="submit-btn" disabled>Submit Candidate</button>
                 </form>
             </div>
+
+            <!-- Audit Log View -->
+            <div id="auditLogView" class="audit-log-container">
+                <div class="audit-table-wrapper">
+                    <table class="audit-table">
+                        <thead>
+                            <tr>
+                                <th onclick="sortLogs('timestamp')">Timestamp ↕</th>
+                                <th onclick="sortLogs('name')">Candidate Name ↕</th>
+                                <th onclick="sortLogs('email')">Email ↕</th>
+                                <th onclick="sortLogs('exceptions')">Exceptions ↕</th>
+                                <th onclick="sortLogs('flagged')">Flagged ↕</th>
+                                <th onclick="sortLogs('status')">Status ↕</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auditLogBody">
+                            <!-- Logs will be injected here -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="log-actions">
+                    <button id="exportJsonBtn" class="action-btn btn-export">Export as JSON</button>
+                    <button id="clearLogsBtn" class="action-btn btn-clear">Clear All Logs</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
         let config = null;
+        let submissions = JSON.parse(localStorage.getItem('admitGuardSubmissions') || '[]');
+        let currentView = 'form';
+        let sortConfig = { key: 'timestamp', direction: 'desc' };
 
         async function loadRules() {
             try {
@@ -444,6 +609,49 @@
             const submitBtn = document.getElementById('submitBtn');
             const rejectionBanner = document.getElementById('rejectionBanner');
             const managerBanner = document.getElementById('managerBanner');
+            const toggleViewBtn = document.getElementById('toggleViewBtn');
+            const formView = document.getElementById('formView');
+            const auditLogView = document.getElementById('auditLogView');
+            const headerTitle = document.getElementById('headerTitle');
+            const exportJsonBtn = document.getElementById('exportJsonBtn');
+            const clearLogsBtn = document.getElementById('clearLogsBtn');
+
+            // View Toggling
+            toggleViewBtn.addEventListener('click', () => {
+                if (currentView === 'form') {
+                    currentView = 'log';
+                    formView.style.display = 'none';
+                    auditLogView.style.display = 'block';
+                    toggleViewBtn.textContent = '← Back to Form';
+                    headerTitle.textContent = 'AdmitGuard — Submission Audit Log';
+                    renderAuditLog();
+                } else {
+                    currentView = 'form';
+                    formView.style.display = 'block';
+                    auditLogView.style.display = 'none';
+                    toggleViewBtn.textContent = 'View Audit Log →';
+                    headerTitle.textContent = 'AdmitGuard';
+                }
+            });
+
+            // Log Actions
+            exportJsonBtn.addEventListener('click', () => {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(submissions, null, 2));
+                const downloadAnchorNode = document.createElement('a');
+                downloadAnchorNode.setAttribute("href", dataStr);
+                downloadAnchorNode.setAttribute("download", `admitguard_logs_${new Date().toISOString()}.json`);
+                document.body.appendChild(downloadAnchorNode);
+                downloadAnchorNode.click();
+                downloadAnchorNode.remove();
+            });
+
+            clearLogsBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear ALL submission logs? This action cannot be undone.')) {
+                    submissions = [];
+                    localStorage.setItem('admitGuardSubmissions', JSON.stringify(submissions));
+                    renderAuditLog();
+                }
+            });
 
             // Update UI with config values
             document.getElementById('fullNameError').textContent = `Name must be at least ${config.name.minLength} characters and contain no numbers`;
@@ -467,7 +675,19 @@
                 email: {
                     el: document.getElementById('email'),
                     error: document.getElementById('emailError'),
-                    validate: (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)
+                    validate: (val) => {
+                        const isFormatValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+                        if (!isFormatValid) {
+                            fields.email.error.textContent = "Please enter a valid email address";
+                            return false;
+                        }
+                        const isDuplicate = submissions.some(s => s.candidateData.email.toLowerCase() === val.toLowerCase());
+                        if (isDuplicate) {
+                            fields.email.error.textContent = "This email has already been submitted. Duplicate entries are not allowed.";
+                            return false;
+                        }
+                        return true;
+                    }
                 },
                 phone: {
                     el: document.getElementById('phone'),
@@ -610,6 +830,76 @@
                 }
             };
 
+            function maskAadhaar(val) {
+                if (!val) return "";
+                return "XXXX-XXXX-" + val.slice(-4);
+            }
+
+            function renderAuditLog() {
+                const body = document.getElementById('auditLogBody');
+                body.innerHTML = '';
+
+                if (submissions.length === 0) {
+                    body.innerHTML = '<tr><td colspan="6" class="no-logs">No submissions yet.</td></tr>';
+                    return;
+                }
+
+                // Sort submissions
+                const sorted = [...submissions].sort((a, b) => {
+                    let valA, valB;
+                    if (sortConfig.key === 'timestamp') {
+                        valA = new Date(a.timestamp);
+                        valB = new Date(b.timestamp);
+                    } else if (sortConfig.key === 'name') {
+                        valA = a.candidateData.name.toLowerCase();
+                        valB = b.candidateData.name.toLowerCase();
+                    } else if (sortConfig.key === 'email') {
+                        valA = a.candidateData.email.toLowerCase();
+                        valB = b.candidateData.email.toLowerCase();
+                    } else if (sortConfig.key === 'exceptions') {
+                        valA = a.exceptionCount;
+                        valB = b.exceptionCount;
+                    } else if (sortConfig.key === 'flagged') {
+                        valA = a.flaggedForReview ? 1 : 0;
+                        valB = b.flaggedForReview ? 1 : 0;
+                    } else if (sortConfig.key === 'status') {
+                        valA = a.status.toLowerCase();
+                        valB = b.status.toLowerCase();
+                    }
+
+                    if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+                    if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+                    return 0;
+                });
+
+                sorted.forEach(log => {
+                    const tr = document.createElement('tr');
+                    if (log.flaggedForReview) tr.classList.add('flagged-row');
+
+                    const statusClass = log.flaggedForReview ? 'status-flagged' : (log.exceptionCount > 0 ? 'status-pending' : 'status-cleared');
+                    
+                    tr.innerHTML = `
+                        <td>${new Date(log.timestamp).toLocaleString()}</td>
+                        <td>${log.candidateData.name}</td>
+                        <td>${log.candidateData.email}</td>
+                        <td>${log.exceptionCount}</td>
+                        <td>${log.flaggedForReview ? 'YES' : 'NO'}</td>
+                        <td><span class="status-badge ${statusClass}">${log.status}</span></td>
+                    `;
+                    body.appendChild(tr);
+                });
+            }
+
+            window.sortLogs = (key) => {
+                if (sortConfig.key === key) {
+                    sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    sortConfig.key = key;
+                    sortConfig.direction = 'asc';
+                }
+                renderAuditLog();
+            };
+
             function validateRationale(val, counterEl, errorEl) {
                 const lengthValid = val.length >= config.exception.minRationaleLength;
                 const phraseValid = config.exception.requiredKeywords.some(p => val.toLowerCase().includes(p.toLowerCase()));
@@ -727,12 +1017,60 @@
                 }
             }
 
-            // Prevent submission if disabled (extra safety)
+            // Handle submission
             form.addEventListener('submit', (e) => {
-                if (submitBtn.disabled) {
-                    e.preventDefault();
-                } else {
-                    alert('Candidate submitted successfully!');
+                e.preventDefault();
+                if (submitBtn.disabled) return;
+
+                const exceptionDetails = {};
+                let exceptionCount = 0;
+                for (const key in fields) {
+                    const field = fields[key];
+                    if (field.exceptionRequested) {
+                        exceptionDetails[key] = field.rationaleEl.value;
+                        exceptionCount++;
+                    }
+                }
+
+                const submission = {
+                    id: 'SUB-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+                    timestamp: new Date().toISOString(),
+                    submittedBy: 'Counselor',
+                    candidateData: {
+                        name: fields.fullName.el.value,
+                        email: fields.email.el.value,
+                        phone: fields.phone.el.value,
+                        qualification: fields.qualification.el.value,
+                        interviewStatus: fields.interviewStatus.el.value,
+                        aadhaar: maskAadhaar(fields.aadhaar.el.value),
+                        offerLetter: fields.offerLetter.el.value,
+                        age: fields.age.el.value,
+                        gradYear: fields.gradYear.el.value,
+                        score: fields.score.el.value,
+                        testScore: fields.testScore.el.value
+                    },
+                    exceptionsUsed: exceptionDetails,
+                    exceptionCount: exceptionCount,
+                    flaggedForReview: exceptionCount > config.exception.maxExceptionsBeforeFlag,
+                    status: exceptionCount > config.exception.maxExceptionsBeforeFlag ? 'FLAGGED' : (exceptionCount > 0 ? 'PENDING' : 'CLEARED')
+                };
+
+                submissions.push(submission);
+                localStorage.setItem('admitGuardSubmissions', JSON.stringify(submissions));
+
+                alert('Candidate submitted successfully and logged to audit trail!');
+                form.reset();
+                
+                // Reset all exception states
+                for (const key in fields) {
+                    const field = fields[key];
+                    if (field.exceptionRequested) {
+                        field.exceptionRequested = false;
+                        field.exceptionToggle.classList.remove('active');
+                        field.rationaleBox.style.display = 'none';
+                        field.rationaleEl.value = "";
+                    }
+                    validateField(key);
                 }
             });
         }
