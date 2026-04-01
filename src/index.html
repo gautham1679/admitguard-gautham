@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdmitGuard - Admission Form</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f7f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: #1a1a2e;
+            color: #ffffff;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .form-container {
+            padding: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: #e67e22;
+        }
+
+        input::placeholder {
+            color: #aaa;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: #e67e22;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: not-allowed;
+            opacity: 0.6;
+            margin-top: 10px;
+            transition: background-color 0.2s;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 480px) {
+            .card {
+                box-shadow: none;
+                border-radius: 0;
+            }
+            body {
+                padding: 0;
+                background-color: #fff;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="header">
+            <h1>AdmitGuard</h1>
+        </div>
+        <div class="form-container">
+            <form id="admissionForm">
+                <!-- 1. Full Name -->
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" name="fullName">
+                </div>
+
+                <!-- 2. Email Address -->
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email">
+                </div>
+
+                <!-- 3. Phone Number -->
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" placeholder="10-digit mobile number">
+                </div>
+
+                <!-- 4. Qualification -->
+                <div class="form-group">
+                    <label for="qualification">Qualification</label>
+                    <select id="qualification" name="qualification">
+                        <option value="">Select Qualification</option>
+                        <option value="B.Tech">B.Tech</option>
+                        <option value="B.E.">B.E.</option>
+                        <option value="MCA">MCA</option>
+                        <option value="M.Tech">M.Tech</option>
+                        <option value="MBA">MBA</option>
+                        <option value="BCA">BCA</option>
+                        <option value="B.Sc">B.Sc</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <!-- 5. Interview Status -->
+                <div class="form-group">
+                    <label for="interviewStatus">Interview Status</label>
+                    <select id="interviewStatus" name="interviewStatus">
+                        <option value="">Select Status</option>
+                        <option value="Cleared">Cleared</option>
+                        <option value="Rejected">Rejected</option>
+                        <option value="Pending">Pending</option>
+                    </select>
+                </div>
+
+                <!-- 6. Aadhaar Number -->
+                <div class="form-group">
+                    <label for="aadhaar">Aadhaar Number</label>
+                    <input type="text" id="aadhaar" name="aadhaar" placeholder="12-digit Aadhaar">
+                </div>
+
+                <!-- 7. Offer Letter Issued -->
+                <div class="form-group">
+                    <label for="offerLetter">Offer Letter Issued</label>
+                    <select id="offerLetter" name="offerLetter">
+                        <option value="">Select</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select>
+                </div>
+
+                <!-- 8. Age -->
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" name="age" placeholder="Candidate age in years">
+                </div>
+
+                <!-- 9. Graduation Year -->
+                <div class="form-group">
+                    <label for="gradYear">Graduation Year</label>
+                    <input type="number" id="gradYear" name="gradYear" placeholder="e.g. 2022">
+                </div>
+
+                <!-- 10. Percentage / CGPA -->
+                <div class="form-group">
+                    <label for="score">Percentage / CGPA</label>
+                    <input type="number" id="score" name="score" step="0.01" placeholder="e.g. 75 or 8.5">
+                </div>
+
+                <!-- 11. Screening Test Score -->
+                <div class="form-group">
+                    <label for="testScore">Screening Test Score</label>
+                    <input type="number" id="testScore" name="testScore" placeholder="Score out of 100">
+                </div>
+
+                <button type="submit" class="submit-btn" disabled>Submit Candidate</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
+
