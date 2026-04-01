@@ -74,8 +74,30 @@
             border-color: #e67e22;
         }
 
+        input.invalid, select.invalid {
+            border-color: #e74c3c;
+        }
+
         input::placeholder {
             color: #aaa;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 12px;
+            font-style: italic;
+            display: none;
+        }
+
+        .rejection-banner {
+            background-color: #e74c3c;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            display: none;
         }
 
         .submit-btn {
@@ -87,10 +109,16 @@
             border-radius: 4px;
             font-size: 16px;
             font-weight: 600;
+            cursor: pointer;
+            opacity: 1;
+            margin-top: 10px;
+            transition: background-color 0.2s, opacity 0.2s;
+        }
+
+        .submit-btn:disabled {
+            background-color: #ccc;
             cursor: not-allowed;
             opacity: 0.6;
-            margin-top: 10px;
-            transition: background-color 0.2s;
         }
 
         /* Mobile responsiveness */
@@ -113,23 +141,29 @@
             <h1>AdmitGuard</h1>
         </div>
         <div class="form-container">
+            <div id="rejectionBanner" class="rejection-banner">
+                This candidate has been rejected in the interview. Submission is blocked.
+            </div>
             <form id="admissionForm">
                 <!-- 1. Full Name -->
                 <div class="form-group">
                     <label for="fullName">Full Name</label>
                     <input type="text" id="fullName" name="fullName">
+                    <span id="fullNameError" class="error-message">Name must be at least 2 characters and contain no numbers</span>
                 </div>
 
                 <!-- 2. Email Address -->
                 <div class="form-group">
                     <label for="email">Email Address</label>
                     <input type="email" id="email" name="email">
+                    <span id="emailError" class="error-message">Please enter a valid email address</span>
                 </div>
 
                 <!-- 3. Phone Number -->
                 <div class="form-group">
                     <label for="phone">Phone Number</label>
                     <input type="tel" id="phone" name="phone" placeholder="10-digit mobile number">
+                    <span id="phoneError" class="error-message">Phone must be 10 digits starting with 6, 7, 8, or 9</span>
                 </div>
 
                 <!-- 4. Qualification -->
@@ -146,6 +180,7 @@
                         <option value="B.Sc">B.Sc</option>
                         <option value="Other">Other</option>
                     </select>
+                    <span id="qualificationError" class="error-message">Please select a qualification</span>
                 </div>
 
                 <!-- 5. Interview Status -->
@@ -157,12 +192,14 @@
                         <option value="Rejected">Rejected</option>
                         <option value="Pending">Pending</option>
                     </select>
+                    <span id="interviewStatusError" class="error-message">Submission blocked: Interview status is Rejected</span>
                 </div>
 
                 <!-- 6. Aadhaar Number -->
                 <div class="form-group">
                     <label for="aadhaar">Aadhaar Number</label>
                     <input type="text" id="aadhaar" name="aadhaar" placeholder="12-digit Aadhaar">
+                    <span id="aadhaarError" class="error-message">Aadhaar must be exactly 12 digits</span>
                 </div>
 
                 <!-- 7. Offer Letter Issued -->
@@ -173,6 +210,7 @@
                         <option value="Yes">Yes</option>
                         <option value="No">No</option>
                     </select>
+                    <span id="offerLetterError" class="error-message">Please select an offer letter status</span>
                 </div>
 
                 <!-- 8. Age -->
@@ -199,10 +237,116 @@
                     <input type="number" id="testScore" name="testScore" placeholder="Score out of 100">
                 </div>
 
-                <button type="submit" class="submit-btn" disabled>Submit Candidate</button>
+                <button type="submit" id="submitBtn" class="submit-btn" disabled>Submit Candidate</button>
             </form>
         </div>
     </div>
+
+    <script>
+        const form = document.getElementById('admissionForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const rejectionBanner = document.getElementById('rejectionBanner');
+
+        const fields = {
+            fullName: {
+                el: document.getElementById('fullName'),
+                error: document.getElementById('fullNameError'),
+                validate: (val) => val.length >= 2 && !/\d/.test(val)
+            },
+            email: {
+                el: document.getElementById('email'),
+                error: document.getElementById('emailError'),
+                validate: (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)
+            },
+            phone: {
+                el: document.getElementById('phone'),
+                error: document.getElementById('phoneError'),
+                validate: (val) => /^[6-9]\d{9}$/.test(val)
+            },
+            qualification: {
+                el: document.getElementById('qualification'),
+                error: document.getElementById('qualificationError'),
+                validate: (val) => val !== ""
+            },
+            interviewStatus: {
+                el: document.getElementById('interviewStatus'),
+                error: document.getElementById('interviewStatusError'),
+                validate: (val) => val !== "" && val !== "Rejected"
+            },
+            aadhaar: {
+                el: document.getElementById('aadhaar'),
+                error: document.getElementById('aadhaarError'),
+                validate: (val) => /^\d{12}$/.test(val)
+            },
+            offerLetter: {
+                el: document.getElementById('offerLetter'),
+                error: document.getElementById('offerLetterError'),
+                validate: (val) => {
+                    const status = fields.interviewStatus.el.value;
+                    if (val === "") return false;
+                    if (val === "Yes" && status !== "Cleared") {
+                        fields.offerLetter.error.textContent = "Offer letter can only be issued if interview is Cleared";
+                        return false;
+                    }
+                    fields.offerLetter.error.textContent = "Please select an offer letter status";
+                    return true;
+                }
+            }
+        };
+
+        function validateField(fieldName) {
+            const field = fields[fieldName];
+            const isValid = field.validate(field.el.value);
+            
+            if (!isValid) {
+                field.el.classList.add('invalid');
+                field.error.style.display = 'block';
+            } else {
+                field.el.classList.remove('invalid');
+                field.error.style.display = 'none';
+            }
+
+            // Special handling for Interview Status banner
+            if (fieldName === 'interviewStatus') {
+                if (field.el.value === 'Rejected') {
+                    rejectionBanner.style.display = 'block';
+                } else {
+                    rejectionBanner.style.display = 'none';
+                }
+                // Re-validate offer letter when interview status changes
+                validateField('offerLetter');
+            }
+
+            checkFormValidity();
+        }
+
+        function checkFormValidity() {
+            let allValid = true;
+            for (const key in fields) {
+                if (!fields[key].validate(fields[key].el.value)) {
+                    allValid = false;
+                    break;
+                }
+            }
+            submitBtn.disabled = !allValid;
+        }
+
+        // Add listeners
+        for (const key in fields) {
+            const field = fields[key];
+            field.el.addEventListener('input', () => validateField(key));
+            field.el.addEventListener('blur', () => validateField(key));
+        }
+
+        // Prevent submission if disabled (extra safety)
+        form.addEventListener('submit', (e) => {
+            if (submitBtn.disabled) {
+                e.preventDefault();
+            } else {
+                alert('Candidate submitted successfully!');
+            }
+        });
+    </script>
 
 </body>
 </html>
