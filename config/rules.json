@@ -2,61 +2,62 @@
   "version": "1.0",
   "cohort": "2025-Batch-1",
   "lastUpdated": "2025-04-02",
-  "strictRules": {
-    "name": {
-      "minLength": 2,
-      "allowNumbers": false,
-      "errorMessage": "Name must be at least 2 characters and contain no numbers"
-    },
-    "email": {
-      "mustBeUnique": true,
-      "errorMessage": "Please enter a valid email address"
-    },
-    "phone": {
-      "exactDigits": 10,
-      "mustStartWith": ["6", "7", "8", "9"],
-      "errorMessage": "Phone must be 10 digits starting with 6, 7, 8, or 9"
-    },
-    "aadhaar": {
-      "exactDigits": 12,
-      "errorMessage": "Aadhaar must be exactly 12 digits"
-    },
-    "interviewStatus": {
-      "blockedValues": ["Rejected"],
-      "errorMessage": "Submission blocked: Interview status is Rejected"
-    },
-    "offerLetter": {
-      "requiresInterviewStatus": "Cleared",
-      "errorMessage": "Offer letter can only be issued if interview is Cleared"
-    }
+
+  "name": {
+    "minLength": 2,
+    "allowNumbers": false
   },
-  "softRules": {
-    "age": {
-      "min": 18,
-      "max": 35,
-      "warningMessage": "Candidate age is outside the 18-35 range. Exception required."
-    },
-    "graduationYear": {
-      "min": 2015,
-      "max": 2025,
-      "warningMessage": "Graduation year must be between 2015 and 2025. Exception required."
-    },
-    "percentage": {
-      "minPercentage": 60,
-      "minCGPA": 6.0,
-      "cgpaThreshold": 10,
-      "warningMessage": "Percentage below 60% (or CGPA below 6.0). Exception required."
-    },
-    "screeningScore": {
-      "min": 40,
-      "max": 100,
-      "warningMessage": "Screening score below minimum (40/100). Exception required."
-    }
+
+  "email": {
+    "mustBeUnique": true
   },
-  "exceptionRules": {
+
+  "phone": {
+    "exactDigits": 10,
+    "mustStartWith": ["6", "7", "8", "9"]
+  },
+
+  "aadhaar": {
+    "exactDigits": 12
+  },
+
+  "interviewStatus": {
+    "blockedValues": ["Rejected"]
+  },
+
+  "offerLetter": {
+    "requiresInterviewStatus": "Cleared"
+  },
+
+  "age": {
+    "min": 18,
+    "max": 35
+  },
+
+  "graduationYear": {
+    "min": 2015,
+    "max": 2025
+  },
+
+  "percentage": {
+    "minPercentage": 60,
+    "minCGPA": 6.0,
+    "cgpaThreshold": 10
+  },
+
+  "screeningScore": {
+    "min": 40,
+    "max": 100
+  },
+
+  "exception": {
     "minRationaleLength": 30,
-    "requiredKeywords": ["approved by", "special case", "documentation pending", "waiver granted"],
-    "maxExceptionsBeforeFlag": 2,
-    "flagMessage": "FLAGGED FOR MANAGER REVIEW: This submission has 3+ exceptions and requires manager approval before processing."
+    "requiredKeywords": [
+      "approved by",
+      "special case",
+      "documentation pending",
+      "waiver granted"
+    ],
+    "maxExceptionsBeforeFlag": 2
   }
 }
