@@ -212,6 +212,192 @@
             font-weight: 600;
         }
 
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background-color: #eee;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #e67e22;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Success View */
+        #successView {
+            display: none;
+            padding: 40px 20px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .success-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .success-card {
+            background-color: #f0fff4;
+            border: 1px solid #c6f6d5;
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+
+        .success-card h2 {
+            color: #2f855a;
+            margin-bottom: 16px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .success-detail {
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #4a5568;
+        }
+
+        .success-detail strong {
+            color: #2d3748;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: white;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            border-radius: 8px;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background-color: white;
+            z-index: 1;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            color: #1a1a2e;
+        }
+
+        .close-modal {
+            font-size: 24px;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .close-modal:hover {
+            color: #333;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f9f9f9;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #7f8c8d;
+            font-size: 13px;
+        }
+
+        .detail-value {
+            color: #2c3e50;
+            font-size: 13px;
+            text-align: right;
+        }
+
+        .detail-section {
+            margin-top: 20px;
+        }
+
+        .detail-section h4 {
+            font-size: 14px;
+            color: #e67e22;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ffe8d6;
+            padding-bottom: 4px;
+        }
+
+        /* Label Enhancements */
+        .required-star {
+            color: #e74c3c;
+            margin-left: 2px;
+        }
+
+        .optional-text {
+            color: #95a5a6;
+            font-weight: normal;
+            font-size: 12px;
+            margin-left: 4px;
+        }
+
+        .helper-text {
+            font-size: 11px;
+            color: #7f8c8d;
+            font-style: italic;
+            margin-top: -4px;
+            margin-bottom: 4px;
+        }
+
+        .info-message {
+            font-size: 12px;
+            color: #3498db;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .char-counter {
+            font-size: 11px;
+            color: #95a5a6;
+            margin-top: 2px;
+        }
+
         .submit-btn {
             width: 100%;
             padding: 14px;
@@ -406,34 +592,38 @@
 
             <!-- Form View -->
             <div id="formView" class="form-container">
+                <div class="progress-container">
+                    <div id="progressBar" class="progress-bar"></div>
+                </div>
                 <div id="rejectionBanner" class="rejection-banner">
                     This candidate has been rejected in the interview. Submission is blocked.
                 </div>
                 <form id="admissionForm">
                     <!-- 1. Full Name -->
                     <div class="form-group">
-                        <label for="fullName">Full Name</label>
+                        <label for="fullName">Full Name<span class="required-star">*</span></label>
                         <input type="text" id="fullName" name="fullName">
+                        <span id="fullNameCharCount" class="char-counter">0 characters</span>
                         <span id="fullNameError" class="error-message"></span>
                     </div>
 
                     <!-- 2. Email Address -->
                     <div class="form-group">
-                        <label for="email">Email Address</label>
+                        <label for="email">Email Address<span class="required-star">*</span></label>
                         <input type="email" id="email" name="email">
                         <span id="emailError" class="error-message">Please enter a valid email address</span>
                     </div>
 
                     <!-- 3. Phone Number -->
                     <div class="form-group">
-                        <label for="phone">Phone Number</label>
+                        <label for="phone">Phone Number<span class="required-star">*</span></label>
                         <input type="tel" id="phone" name="phone">
                         <span id="phoneError" class="error-message"></span>
                     </div>
 
                     <!-- 4. Qualification -->
                     <div class="form-group">
-                        <label for="qualification">Qualification</label>
+                        <label for="qualification">Qualification<span class="required-star">*</span></label>
                         <select id="qualification" name="qualification">
                             <option value="">Select Qualification</option>
                             <option value="B.Tech">B.Tech</option>
@@ -450,7 +640,7 @@
 
                     <!-- 5. Interview Status -->
                     <div class="form-group">
-                        <label for="interviewStatus">Interview Status</label>
+                        <label for="interviewStatus">Interview Status<span class="required-star">*</span></label>
                         <select id="interviewStatus" name="interviewStatus">
                             <option value="">Select Status</option>
                             <option value="Cleared">Cleared</option>
@@ -462,25 +652,26 @@
 
                     <!-- 6. Aadhaar Number -->
                     <div class="form-group">
-                        <label for="aadhaar">Aadhaar Number</label>
+                        <label for="aadhaar">Aadhaar Number<span class="required-star">*</span></label>
                         <input type="text" id="aadhaar" name="aadhaar">
                         <span id="aadhaarError" class="error-message"></span>
                     </div>
 
                     <!-- 7. Offer Letter Issued -->
                     <div class="form-group">
-                        <label for="offerLetter">Offer Letter Issued</label>
+                        <label for="offerLetter">Offer Letter Issued<span class="required-star">*</span></label>
                         <select id="offerLetter" name="offerLetter">
                             <option value="">Select</option>
                             <option value="Yes">Yes</option>
                             <option value="No">No</option>
                         </select>
+                        <span id="offerLetterInfo" class="info-message">Offer letter automatically set to No (interview not cleared)</span>
                         <span id="offerLetterError" class="error-message">Please select an offer letter status</span>
                     </div>
 
                     <!-- 8. Age -->
                     <div class="form-group">
-                        <label for="age">Age</label>
+                        <label for="age">Age<span class="required-star">*</span></label>
                         <input type="number" id="age" name="age" placeholder="Candidate age in years">
                         <span id="ageWarning" class="warning-message"></span>
                         <div id="ageExceptionContainer" class="exception-container">
@@ -498,7 +689,7 @@
 
                     <!-- 9. Graduation Year -->
                     <div class="form-group">
-                        <label for="gradYear">Graduation Year</label>
+                        <label for="gradYear">Graduation Year<span class="required-star">*</span></label>
                         <input type="number" id="gradYear" name="gradYear" placeholder="e.g. 2022">
                         <span id="gradYearWarning" class="warning-message"></span>
                         <div id="gradYearExceptionContainer" class="exception-container">
@@ -516,7 +707,8 @@
 
                     <!-- 10. Percentage / CGPA -->
                     <div class="form-group">
-                        <label for="score">Percentage / CGPA</label>
+                        <label for="score">Percentage / CGPA<span class="required-star">*</span></label>
+                        <span class="helper-text">Enter % (e.g. 75) or CGPA (e.g. 7.5). Values ≤ 10 treated as CGPA.</span>
                         <input type="number" id="score" name="score" step="0.01" placeholder="e.g. 75 or 8.5">
                         <span id="scoreWarning" class="warning-message"></span>
                         <div id="scoreExceptionContainer" class="exception-container">
@@ -534,7 +726,7 @@
 
                     <!-- 11. Screening Test Score -->
                     <div class="form-group">
-                        <label for="testScore">Screening Test Score</label>
+                        <label for="testScore">Screening Test Score<span class="required-star">*</span></label>
                         <input type="number" id="testScore" name="testScore" placeholder="Score out of 100">
                         <span id="testScoreWarning" class="warning-message"></span>
                         <div id="testScoreExceptionContainer" class="exception-container">
@@ -566,6 +758,7 @@
                                 <th onclick="sortLogs('exceptions')">Exceptions ↕</th>
                                 <th onclick="sortLogs('flagged')">Flagged ↕</th>
                                 <th onclick="sortLogs('status')">Status ↕</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="auditLogBody">
@@ -577,6 +770,31 @@
                     <button id="exportJsonBtn" class="action-btn btn-export">Export as JSON</button>
                     <button id="clearLogsBtn" class="action-btn btn-clear">Clear All Logs</button>
                 </div>
+            </div>
+
+            <!-- Success View -->
+            <div id="successView">
+                <span class="success-icon">✅</span>
+                <div class="success-card">
+                    <h2>Candidate Submitted Successfully</h2>
+                    <div id="successDetails">
+                        <!-- Details injected here -->
+                    </div>
+                </div>
+                <button id="resetFormBtn" class="submit-btn">Submit Another Candidate</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div id="detailsModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Submission Details</h3>
+                <span class="close-modal" onclick="closeModal()">&times;</span>
+            </div>
+            <div id="modalBody" class="modal-body">
+                <!-- Details injected here -->
             </div>
         </div>
     </div>
@@ -615,12 +833,19 @@
             const headerTitle = document.getElementById('headerTitle');
             const exportJsonBtn = document.getElementById('exportJsonBtn');
             const clearLogsBtn = document.getElementById('clearLogsBtn');
+            const progressBar = document.getElementById('progressBar');
+            const successView = document.getElementById('successView');
+            const successDetails = document.getElementById('successDetails');
+            const resetFormBtn = document.getElementById('resetFormBtn');
+            const offerLetterInfo = document.getElementById('offerLetterInfo');
+            const fullNameCharCount = document.getElementById('fullNameCharCount');
 
             // View Toggling
             toggleViewBtn.addEventListener('click', () => {
                 if (currentView === 'form') {
                     currentView = 'log';
                     formView.style.display = 'none';
+                    successView.style.display = 'none';
                     auditLogView.style.display = 'block';
                     toggleViewBtn.textContent = '← Back to Form';
                     headerTitle.textContent = 'AdmitGuard — Submission Audit Log';
@@ -629,10 +854,130 @@
                     currentView = 'form';
                     formView.style.display = 'block';
                     auditLogView.style.display = 'none';
+                    successView.style.display = 'none';
                     toggleViewBtn.textContent = 'View Audit Log →';
                     headerTitle.textContent = 'AdmitGuard';
+                    updateProgress();
                 }
             });
+
+            // Reset Form
+            resetFormBtn.addEventListener('click', () => {
+                resetForm();
+            });
+
+            function resetForm() {
+                form.reset();
+                currentView = 'form';
+                formView.style.display = 'block';
+                successView.style.display = 'none';
+                auditLogView.style.display = 'none';
+                toggleViewBtn.style.display = 'block';
+                headerTitle.textContent = 'AdmitGuard';
+                
+                // Reset all exception states
+                for (const key in fields) {
+                    const field = fields[key];
+                    if (field.exceptionRequested) {
+                        field.exceptionRequested = false;
+                        field.exceptionToggle.classList.remove('active');
+                        field.rationaleBox.style.display = 'none';
+                        field.rationaleEl.value = "";
+                    }
+                    validateField(key);
+                }
+                updateProgress();
+            }
+
+            function updateProgress() {
+                const requiredFields = ['fullName', 'email', 'phone', 'qualification', 'interviewStatus', 'aadhaar', 'offerLetter', 'age', 'gradYear', 'score', 'testScore'];
+                let filledCount = 0;
+                requiredFields.forEach(key => {
+                    if (fields[key].el.value !== "") filledCount++;
+                });
+                const percentage = (filledCount / requiredFields.length) * 100;
+                progressBar.style.width = `${percentage}%`;
+            }
+
+            function showSuccessView(submission) {
+                currentView = 'success';
+                formView.style.display = 'none';
+                auditLogView.style.display = 'none';
+                successView.style.display = 'block';
+                toggleViewBtn.style.display = 'none';
+                headerTitle.textContent = 'Submission Confirmed';
+
+                successDetails.innerHTML = `
+                    <div class="success-detail"><strong>Candidate Name:</strong> ${submission.candidateData.name}</div>
+                    <div class="success-detail"><strong>Timestamp:</strong> ${new Date(submission.timestamp).toLocaleString()}</div>
+                    <div class="success-detail"><strong>Exceptions Used:</strong> ${submission.exceptionCount}</div>
+                    <div class="success-detail"><strong>Flagged for Review:</strong> ${submission.flaggedForReview ? 'Yes' : 'No'}</div>
+                    <div class="success-detail"><strong>Status:</strong> ${submission.status}</div>
+                `;
+            }
+
+            window.viewDetails = (id) => {
+                const log = submissions.find(s => s.id === id);
+                if (!log) return;
+
+                const modal = document.getElementById('detailsModal');
+                const modalBody = document.getElementById('modalBody');
+                
+                let exceptionsHtml = '';
+                if (log.exceptionCount > 0) {
+                    exceptionsHtml = '<div class="detail-section"><h4>Exception Rationales</h4>';
+                    for (const key in log.exceptionsUsed) {
+                        exceptionsHtml += `
+                            <div class="detail-row">
+                                <div class="detail-label">${key.charAt(0).toUpperCase() + key.slice(1)}:</div>
+                                <div class="detail-value">${log.exceptionsUsed[key]}</div>
+                            </div>
+                        `;
+                    }
+                    exceptionsHtml += '</div>';
+                }
+
+                modalBody.innerHTML = `
+                    <div class="detail-section">
+                        <h4>Candidate Information</h4>
+                        <div class="detail-row"><div class="detail-label">Name:</div><div class="detail-value">${log.candidateData.name}</div></div>
+                        <div class="detail-row"><div class="detail-label">Email:</div><div class="detail-value">${log.candidateData.email}</div></div>
+                        <div class="detail-row"><div class="detail-label">Phone:</div><div class="detail-value">${log.candidateData.phone}</div></div>
+                        <div class="detail-row"><div class="detail-label">Aadhaar:</div><div class="detail-value">${log.candidateData.aadhaar}</div></div>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Academic & Interview</h4>
+                        <div class="detail-row"><div class="detail-label">Qualification:</div><div class="detail-value">${log.candidateData.qualification}</div></div>
+                        <div class="detail-row"><div class="detail-label">Interview Status:</div><div class="detail-value">${log.candidateData.interviewStatus}</div></div>
+                        <div class="detail-row"><div class="detail-label">Offer Letter:</div><div class="detail-value">${log.candidateData.offerLetter}</div></div>
+                        <div class="detail-row"><div class="detail-label">Age:</div><div class="detail-value">${log.candidateData.age}</div></div>
+                        <div class="detail-row"><div class="detail-label">Graduation Year:</div><div class="detail-value">${log.candidateData.gradYear}</div></div>
+                        <div class="detail-row"><div class="detail-label">Score:</div><div class="detail-value">${log.candidateData.score}</div></div>
+                        <div class="detail-row"><div class="detail-label">Screening Score:</div><div class="detail-value">${log.candidateData.testScore}</div></div>
+                    </div>
+                    ${exceptionsHtml}
+                    <div class="detail-section">
+                        <h4>Submission Metadata</h4>
+                        <div class="detail-row"><div class="detail-label">Submission ID:</div><div class="detail-value">${log.id}</div></div>
+                        <div class="detail-row"><div class="detail-label">Timestamp:</div><div class="detail-value">${new Date(log.timestamp).toLocaleString()}</div></div>
+                        <div class="detail-row"><div class="detail-label">Submitted By:</div><div class="detail-value">${log.submittedBy}</div></div>
+                        <div class="detail-row"><div class="detail-label">Status:</div><div class="detail-value">${log.status}</div></div>
+                    </div>
+                `;
+                modal.style.display = 'flex';
+            };
+
+            window.closeModal = () => {
+                document.getElementById('detailsModal').style.display = 'none';
+            };
+
+            // Close modal on outside click
+            window.onclick = (event) => {
+                const modal = document.getElementById('detailsModal');
+                if (event.target === modal) {
+                    closeModal();
+                }
+            };
 
             // Log Actions
             exportJsonBtn.addEventListener('click', () => {
@@ -840,7 +1185,7 @@
                 body.innerHTML = '';
 
                 if (submissions.length === 0) {
-                    body.innerHTML = '<tr><td colspan="6" class="no-logs">No submissions yet.</td></tr>';
+                    body.innerHTML = '<tr><td colspan="7" class="no-logs">No submissions yet.</td></tr>';
                     return;
                 }
 
@@ -885,6 +1230,7 @@
                         <td>${log.exceptionCount}</td>
                         <td>${log.flaggedForReview ? 'YES' : 'NO'}</td>
                         <td><span class="status-badge ${statusClass}">${log.status}</span></td>
+                        <td><button class="action-btn" onclick="viewDetails('${log.id}')">View Details</button></td>
                     `;
                     body.appendChild(tr);
                 });
@@ -924,6 +1270,17 @@
                 const field = fields[fieldName];
                 if (!field) return;
                 
+                // Name character counter
+                if (fieldName === 'fullName') {
+                    const len = field.el.value.length;
+                    fullNameCharCount.textContent = `${len} characters`;
+                    if (len >= config.name.minLength) {
+                        fullNameCharCount.classList.add('valid');
+                    } else {
+                        fullNameCharCount.classList.remove('valid');
+                    }
+                }
+
                 // Strict Validation (Red Errors)
                 if (field.error) {
                     const isValid = field.validate(field.el.value);
@@ -958,12 +1315,23 @@
                     }
                 }
 
-                // Special handling for Interview Status banner
+                // Special handling for Interview Status banner and Offer Letter dependency
                 if (fieldName === 'interviewStatus') {
                     if (field.el.value === 'Rejected') {
                         rejectionBanner.style.display = 'block';
                     } else {
                         rejectionBanner.style.display = 'none';
+                    }
+
+                    // Reset Offer Letter if interview not cleared
+                    if (field.el.value !== 'Cleared' && field.el.value !== "") {
+                        if (fields.offerLetter.el.value === 'Yes') {
+                            fields.offerLetter.el.value = 'No';
+                            offerLetterInfo.style.display = 'block';
+                            setTimeout(() => {
+                                offerLetterInfo.style.display = 'none';
+                            }, 3000);
+                        }
                     }
                     validateField('offerLetter');
                 }
@@ -993,6 +1361,7 @@
                     managerBanner.style.display = 'none';
                 }
 
+                updateProgress();
                 submitBtn.disabled = !allValid;
             }
 
@@ -1058,21 +1427,11 @@
                 submissions.push(submission);
                 localStorage.setItem('admitGuardSubmissions', JSON.stringify(submissions));
 
-                alert('Candidate submitted successfully and logged to audit trail!');
-                form.reset();
-                
-                // Reset all exception states
-                for (const key in fields) {
-                    const field = fields[key];
-                    if (field.exceptionRequested) {
-                        field.exceptionRequested = false;
-                        field.exceptionToggle.classList.remove('active');
-                        field.rationaleBox.style.display = 'none';
-                        field.rationaleEl.value = "";
-                    }
-                    validateField(key);
-                }
+                showSuccessView(submission);
             });
+
+            // Initial progress update
+            updateProgress();
         }
 
         // Start loading rules
