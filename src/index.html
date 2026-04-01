@@ -89,6 +89,13 @@
             display: none;
         }
 
+        .warning-message {
+            color: #f39c12;
+            font-size: 12px;
+            font-style: italic;
+            display: none;
+        }
+
         .rejection-banner {
             background-color: #e74c3c;
             color: white;
@@ -217,24 +224,28 @@
                 <div class="form-group">
                     <label for="age">Age</label>
                     <input type="number" id="age" name="age" placeholder="Candidate age in years">
+                    <span id="ageWarning" class="warning-message"></span>
                 </div>
 
                 <!-- 9. Graduation Year -->
                 <div class="form-group">
                     <label for="gradYear">Graduation Year</label>
                     <input type="number" id="gradYear" name="gradYear" placeholder="e.g. 2022">
+                    <span id="gradYearWarning" class="warning-message"></span>
                 </div>
 
                 <!-- 10. Percentage / CGPA -->
                 <div class="form-group">
                     <label for="score">Percentage / CGPA</label>
                     <input type="number" id="score" name="score" step="0.01" placeholder="e.g. 75 or 8.5">
+                    <span id="scoreWarning" class="warning-message"></span>
                 </div>
 
                 <!-- 11. Screening Test Score -->
                 <div class="form-group">
                     <label for="testScore">Screening Test Score</label>
                     <input type="number" id="testScore" name="testScore" placeholder="Score out of 100">
+                    <span id="testScoreWarning" class="warning-message"></span>
                 </div>
 
                 <button type="submit" id="submitBtn" class="submit-btn" disabled>Submit Candidate</button>
@@ -291,19 +302,82 @@
                     fields.offerLetter.error.textContent = "Please select an offer letter status";
                     return true;
                 }
+            },
+            age: {
+                el: document.getElementById('age'),
+                warning: document.getElementById('ageWarning'),
+                warn: (val) => {
+                    if (!val) return "";
+                    const age = parseInt(val);
+                    if (age < 18) return "⚠️ Candidate is under 18. Exception required.";
+                    if (age > 35) return "⚠️ Candidate is above 35. Exception required.";
+                    return "";
+                },
+                validate: () => true
+            },
+            gradYear: {
+                el: document.getElementById('gradYear'),
+                warning: document.getElementById('gradYearWarning'),
+                warn: (val) => {
+                    if (!val) return "";
+                    const year = parseInt(val);
+                    if (year < 2015 || year > 2025) return "⚠️ Graduation year must be between 2015 and 2025. Exception required.";
+                    return "";
+                },
+                validate: () => true
+            },
+            score: {
+                el: document.getElementById('score'),
+                warning: document.getElementById('scoreWarning'),
+                warn: (val) => {
+                    if (!val) return "";
+                    const num = parseFloat(val);
+                    if (num > 10) {
+                        if (num < 60) return "⚠️ Percentage below 60% (or CGPA below 6.0). Exception required.";
+                    } else {
+                        if (num < 6.0) return "⚠️ Percentage below 60% (or CGPA below 6.0). Exception required.";
+                    }
+                    return "";
+                },
+                validate: () => true
+            },
+            testScore: {
+                el: document.getElementById('testScore'),
+                warning: document.getElementById('testScoreWarning'),
+                warn: (val) => {
+                    if (!val) return "";
+                    const num = parseFloat(val);
+                    if (num < 40) return "⚠️ Screening score below minimum (40/100). Exception required.";
+                    return "";
+                },
+                validate: () => true
             }
         };
 
         function validateField(fieldName) {
             const field = fields[fieldName];
-            const isValid = field.validate(field.el.value);
             
-            if (!isValid) {
-                field.el.classList.add('invalid');
-                field.error.style.display = 'block';
-            } else {
-                field.el.classList.remove('invalid');
-                field.error.style.display = 'none';
+            // Strict Validation
+            if (field.error) {
+                const isValid = field.validate(field.el.value);
+                if (!isValid) {
+                    field.el.classList.add('invalid');
+                    field.error.style.display = 'block';
+                } else {
+                    field.el.classList.remove('invalid');
+                    field.error.style.display = 'none';
+                }
+            }
+
+            // Soft Validation (Warnings)
+            if (field.warn && field.warning) {
+                const warningMsg = field.warn(field.el.value);
+                if (warningMsg) {
+                    field.warning.textContent = warningMsg;
+                    field.warning.style.display = 'block';
+                } else {
+                    field.warning.style.display = 'none';
+                }
             }
 
             // Special handling for Interview Status banner
