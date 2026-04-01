@@ -28,6 +28,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            position: relative;
         }
 
         .header {
@@ -60,7 +61,7 @@
             color: #333;
         }
 
-        input, select {
+        input, select, textarea {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
@@ -70,11 +71,17 @@
             transition: border-color 0.2s;
         }
 
-        input:focus, select:focus {
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-size: 14px;
+        }
+
+        input:focus, select:focus, textarea:focus {
             border-color: #e67e22;
         }
 
-        input.invalid, select.invalid {
+        input.invalid, select.invalid, textarea.invalid {
             border-color: #e74c3c;
         }
 
@@ -94,6 +101,7 @@
             font-size: 12px;
             font-style: italic;
             display: none;
+            margin-bottom: 4px;
         }
 
         .rejection-banner {
@@ -105,6 +113,69 @@
             margin-bottom: 20px;
             border-radius: 4px;
             display: none;
+        }
+
+        .manager-banner {
+            background-color: #e74c3c;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+            border-bottom: 2px solid #c0392b;
+        }
+
+        .exception-container {
+            margin-top: 4px;
+            display: none;
+        }
+
+        .exception-toggle {
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            width: fit-content;
+            transition: background-color 0.2s;
+        }
+
+        .exception-toggle.active {
+            background-color: #d35400;
+        }
+
+        .rationale-box {
+            margin-top: 10px;
+            padding: 12px;
+            background-color: #fff9f0;
+            border: 1px solid #f39c12;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .rationale-box label {
+            display: block;
+            margin-bottom: 6px;
+            color: #d35400;
+        }
+
+        .rationale-meta {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 4px;
+        }
+
+        .char-counter {
+            font-size: 11px;
+            color: #7f8c8d;
+        }
+
+        .char-counter.valid {
+            color: #27ae60;
+            font-weight: 600;
         }
 
         .submit-btn {
@@ -144,6 +215,9 @@
 <body>
 
     <div class="card">
+        <div id="managerBanner" class="manager-banner">
+            ⚠️ FLAGGED FOR MANAGER REVIEW: This submission has 3+ exceptions and requires manager approval before processing.
+        </div>
         <div class="header">
             <h1>AdmitGuard</h1>
         </div>
@@ -225,6 +299,17 @@
                     <label for="age">Age</label>
                     <input type="number" id="age" name="age" placeholder="Candidate age in years">
                     <span id="ageWarning" class="warning-message"></span>
+                    <div id="ageExceptionContainer" class="exception-container">
+                        <button type="button" id="ageExceptionToggle" class="exception-toggle">Request Exception</button>
+                        <div id="ageRationaleBox" class="rationale-box">
+                            <label>Exception Rationale (required)</label>
+                            <textarea id="ageRationale" placeholder="Enter rationale..."></textarea>
+                            <div class="rationale-meta">
+                                <span id="ageCharCounter" class="char-counter">0 / 30 characters minimum</span>
+                            </div>
+                            <span id="ageRationaleError" class="error-message">Rationale must be ≥30 chars and contain: 'approved by', 'special case', 'documentation pending', or 'waiver granted'</span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- 9. Graduation Year -->
@@ -232,6 +317,17 @@
                     <label for="gradYear">Graduation Year</label>
                     <input type="number" id="gradYear" name="gradYear" placeholder="e.g. 2022">
                     <span id="gradYearWarning" class="warning-message"></span>
+                    <div id="gradYearExceptionContainer" class="exception-container">
+                        <button type="button" id="gradYearExceptionToggle" class="exception-toggle">Request Exception</button>
+                        <div id="gradYearRationaleBox" class="rationale-box">
+                            <label>Exception Rationale (required)</label>
+                            <textarea id="gradYearRationale" placeholder="Enter rationale..."></textarea>
+                            <div class="rationale-meta">
+                                <span id="gradYearCharCounter" class="char-counter">0 / 30 characters minimum</span>
+                            </div>
+                            <span id="gradYearRationaleError" class="error-message">Rationale must be ≥30 chars and contain: 'approved by', 'special case', 'documentation pending', or 'waiver granted'</span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- 10. Percentage / CGPA -->
@@ -239,6 +335,17 @@
                     <label for="score">Percentage / CGPA</label>
                     <input type="number" id="score" name="score" step="0.01" placeholder="e.g. 75 or 8.5">
                     <span id="scoreWarning" class="warning-message"></span>
+                    <div id="scoreExceptionContainer" class="exception-container">
+                        <button type="button" id="scoreExceptionToggle" class="exception-toggle">Request Exception</button>
+                        <div id="scoreRationaleBox" class="rationale-box">
+                            <label>Exception Rationale (required)</label>
+                            <textarea id="scoreRationale" placeholder="Enter rationale..."></textarea>
+                            <div class="rationale-meta">
+                                <span id="scoreCharCounter" class="char-counter">0 / 30 characters minimum</span>
+                            </div>
+                            <span id="scoreRationaleError" class="error-message">Rationale must be ≥30 chars and contain: 'approved by', 'special case', 'documentation pending', or 'waiver granted'</span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- 11. Screening Test Score -->
@@ -246,6 +353,17 @@
                     <label for="testScore">Screening Test Score</label>
                     <input type="number" id="testScore" name="testScore" placeholder="Score out of 100">
                     <span id="testScoreWarning" class="warning-message"></span>
+                    <div id="testScoreExceptionContainer" class="exception-container">
+                        <button type="button" id="testScoreExceptionToggle" class="exception-toggle">Request Exception</button>
+                        <div id="testScoreRationaleBox" class="rationale-box">
+                            <label>Exception Rationale (required)</label>
+                            <textarea id="testScoreRationale" placeholder="Enter rationale..."></textarea>
+                            <div class="rationale-meta">
+                                <span id="testScoreCharCounter" class="char-counter">0 / 30 characters minimum</span>
+                            </div>
+                            <span id="testScoreRationaleError" class="error-message">Rationale must be ≥30 chars and contain: 'approved by', 'special case', 'documentation pending', or 'waiver granted'</span>
+                        </div>
+                    </div>
                 </div>
 
                 <button type="submit" id="submitBtn" class="submit-btn" disabled>Submit Candidate</button>
@@ -257,6 +375,9 @@
         const form = document.getElementById('admissionForm');
         const submitBtn = document.getElementById('submitBtn');
         const rejectionBanner = document.getElementById('rejectionBanner');
+        const managerBanner = document.getElementById('managerBanner');
+
+        const phrases = ["approved by", "special case", "documentation pending", "waiver granted"];
 
         const fields = {
             fullName: {
@@ -306,6 +427,13 @@
             age: {
                 el: document.getElementById('age'),
                 warning: document.getElementById('ageWarning'),
+                exceptionContainer: document.getElementById('ageExceptionContainer'),
+                exceptionToggle: document.getElementById('ageExceptionToggle'),
+                rationaleBox: document.getElementById('ageRationaleBox'),
+                rationaleEl: document.getElementById('ageRationale'),
+                charCounter: document.getElementById('ageCharCounter'),
+                rationaleError: document.getElementById('ageRationaleError'),
+                exceptionRequested: false,
                 warn: (val) => {
                     if (!val) return "";
                     const age = parseInt(val);
@@ -313,22 +441,46 @@
                     if (age > 35) return "⚠️ Candidate is above 35. Exception required.";
                     return "";
                 },
-                validate: () => true
+                validate: function() {
+                    const warning = this.warn(this.el.value);
+                    if (!warning) return true;
+                    if (!this.exceptionRequested) return false;
+                    return validateRationale(this.rationaleEl.value, this.charCounter, this.rationaleError);
+                }
             },
             gradYear: {
                 el: document.getElementById('gradYear'),
                 warning: document.getElementById('gradYearWarning'),
+                exceptionContainer: document.getElementById('gradYearExceptionContainer'),
+                exceptionToggle: document.getElementById('gradYearExceptionToggle'),
+                rationaleBox: document.getElementById('gradYearRationaleBox'),
+                rationaleEl: document.getElementById('gradYearRationale'),
+                charCounter: document.getElementById('gradYearCharCounter'),
+                rationaleError: document.getElementById('gradYearRationaleError'),
+                exceptionRequested: false,
                 warn: (val) => {
                     if (!val) return "";
                     const year = parseInt(val);
                     if (year < 2015 || year > 2025) return "⚠️ Graduation year must be between 2015 and 2025. Exception required.";
                     return "";
                 },
-                validate: () => true
+                validate: function() {
+                    const warning = this.warn(this.el.value);
+                    if (!warning) return true;
+                    if (!this.exceptionRequested) return false;
+                    return validateRationale(this.rationaleEl.value, this.charCounter, this.rationaleError);
+                }
             },
             score: {
                 el: document.getElementById('score'),
                 warning: document.getElementById('scoreWarning'),
+                exceptionContainer: document.getElementById('scoreExceptionContainer'),
+                exceptionToggle: document.getElementById('scoreExceptionToggle'),
+                rationaleBox: document.getElementById('scoreRationaleBox'),
+                rationaleEl: document.getElementById('scoreRationale'),
+                charCounter: document.getElementById('scoreCharCounter'),
+                rationaleError: document.getElementById('scoreRationaleError'),
+                exceptionRequested: false,
                 warn: (val) => {
                     if (!val) return "";
                     const num = parseFloat(val);
@@ -339,25 +491,62 @@
                     }
                     return "";
                 },
-                validate: () => true
+                validate: function() {
+                    const warning = this.warn(this.el.value);
+                    if (!warning) return true;
+                    if (!this.exceptionRequested) return false;
+                    return validateRationale(this.rationaleEl.value, this.charCounter, this.rationaleError);
+                }
             },
             testScore: {
                 el: document.getElementById('testScore'),
                 warning: document.getElementById('testScoreWarning'),
+                exceptionContainer: document.getElementById('testScoreExceptionContainer'),
+                exceptionToggle: document.getElementById('testScoreExceptionToggle'),
+                rationaleBox: document.getElementById('testScoreRationaleBox'),
+                rationaleEl: document.getElementById('testScoreRationale'),
+                charCounter: document.getElementById('testScoreCharCounter'),
+                rationaleError: document.getElementById('testScoreRationaleError'),
+                exceptionRequested: false,
                 warn: (val) => {
                     if (!val) return "";
                     const num = parseFloat(val);
                     if (num < 40) return "⚠️ Screening score below minimum (40/100). Exception required.";
                     return "";
                 },
-                validate: () => true
+                validate: function() {
+                    const warning = this.warn(this.el.value);
+                    if (!warning) return true;
+                    if (!this.exceptionRequested) return false;
+                    return validateRationale(this.rationaleEl.value, this.charCounter, this.rationaleError);
+                }
             }
         };
+
+        function validateRationale(val, counterEl, errorEl) {
+            const lengthValid = val.length >= 30;
+            const phraseValid = phrases.some(p => val.toLowerCase().includes(p));
+            
+            counterEl.textContent = `${val.length} / 30 characters minimum`;
+            if (lengthValid) {
+                counterEl.classList.add('valid');
+            } else {
+                counterEl.classList.remove('valid');
+            }
+
+            const isValid = lengthValid && phraseValid;
+            if (val.length > 0 && !isValid) {
+                errorEl.style.display = 'block';
+            } else {
+                errorEl.style.display = 'none';
+            }
+            return isValid;
+        }
 
         function validateField(fieldName) {
             const field = fields[fieldName];
             
-            // Strict Validation
+            // Strict Validation (Red Errors)
             if (field.error) {
                 const isValid = field.validate(field.el.value);
                 if (!isValid) {
@@ -369,14 +558,25 @@
                 }
             }
 
-            // Soft Validation (Warnings)
+            // Soft Validation (Warnings + Exceptions)
             if (field.warn && field.warning) {
                 const warningMsg = field.warn(field.el.value);
                 if (warningMsg) {
                     field.warning.textContent = warningMsg;
                     field.warning.style.display = 'block';
+                    field.exceptionContainer.style.display = 'block';
                 } else {
                     field.warning.style.display = 'none';
+                    field.exceptionContainer.style.display = 'none';
+                    field.exceptionRequested = false;
+                    field.exceptionToggle.classList.remove('active');
+                    field.rationaleBox.style.display = 'none';
+                    field.rationaleEl.value = "";
+                }
+                
+                // If rationale is showing, validate it
+                if (field.exceptionRequested) {
+                    validateRationale(field.rationaleEl.value, field.charCounter, field.rationaleError);
                 }
             }
 
@@ -387,7 +587,6 @@
                 } else {
                     rejectionBanner.style.display = 'none';
                 }
-                // Re-validate offer letter when interview status changes
                 validateField('offerLetter');
             }
 
@@ -396,12 +595,25 @@
 
         function checkFormValidity() {
             let allValid = true;
+            let exceptionCount = 0;
+
             for (const key in fields) {
-                if (!fields[key].validate(fields[key].el.value)) {
+                const field = fields[key];
+                if (!field.validate(field.el.value)) {
                     allValid = false;
-                    break;
+                }
+                if (field.exceptionRequested) {
+                    exceptionCount++;
                 }
             }
+
+            // Manager Review Flag
+            if (exceptionCount > 2) {
+                managerBanner.style.display = 'block';
+            } else {
+                managerBanner.style.display = 'none';
+            }
+
             submitBtn.disabled = !allValid;
         }
 
@@ -410,6 +622,20 @@
             const field = fields[key];
             field.el.addEventListener('input', () => validateField(key));
             field.el.addEventListener('blur', () => validateField(key));
+
+            if (field.exceptionToggle) {
+                field.exceptionToggle.addEventListener('click', () => {
+                    field.exceptionRequested = !field.exceptionRequested;
+                    field.exceptionToggle.classList.toggle('active');
+                    field.rationaleBox.style.display = field.exceptionRequested ? 'block' : 'none';
+                    if (!field.exceptionRequested) {
+                        field.rationaleEl.value = "";
+                    }
+                    validateField(key);
+                });
+
+                field.rationaleEl.addEventListener('input', () => validateField(key));
+            }
         }
 
         // Prevent submission if disabled (extra safety)
